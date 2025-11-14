@@ -1,6 +1,6 @@
 {
   "name": "sold-by-amazon-filter-extension",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Defaults 'Sold by Amazon' on search pages. Click icon to disable/enable for the session.",
   "private": true,
   "type": "module",
