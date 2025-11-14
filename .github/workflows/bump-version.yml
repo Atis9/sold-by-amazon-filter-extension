@@ -1,0 +1,65 @@
+name: Bump Version
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'The type of version bump (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Use a personal access token (PAT) to gain write permissions
+          # for pushing the new commit and tag.
+          token: ${{ secrets.PAT }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Configure Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Bump package.json version
+        id: bump_package
+        run: |
+          # Use --no-git-tag-version to prevent npm from creating a tag
+          npm version --no-git-tag-version ${{ github.event.inputs.version_type }}
+          # Get the new version from package.json
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      - name: Sync manifest.json version
+        run: |
+          NEW_VERSION=${{ steps.bump_package.outputs.new_version }}
+          # Use Node.js to update the manifest file to avoid dependency on jq
+          node -e "
+            const fs = require('fs');
+            const manifestPath = './manifest.json';
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+            manifest.version = '$NEW_VERSION';
+            fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+            console.log(`Updated manifest.json to version ${manifest.version}`);
+          "
+      - name: Commit changes
+        run: |
+          NEW_VERSION=${{ steps.bump_package.outputs.new_version }}
+          git add package.json manifest.json package-lock.json
+          git commit -m "chore(release): bump version to v${NEW_VERSION}"
+      - name: Create new tag
+        run: |
+          NEW_VERSION=${{ steps.bump_package.outputs.new_version }}
+          git tag "v${NEW_VERSION}"
+      - name: Push changes and tag
+        run: |-
+          git push
+          git push --tags
