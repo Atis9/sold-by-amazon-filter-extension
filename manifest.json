@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "sold-by-amazon-filter-extension",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Defaults 'Sold by Amazon' on search pages. Click icon to disable/enable for the session.",
   "permissions": [
     "tabs",
