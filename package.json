@@ -1,0 +1,25 @@
+{
+  "name": "sold-by-amazon-filter-extension",
+  "version": "0.0.2",
+  "description": "Defaults 'Sold by Amazon' on search pages. Click icon to disable/enable for the session.",
+  "private": true,
+  "type": "module",
+  "main": "dist/background.js",
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "^0.1.29",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "jiti": "^2.6.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.2"
+  }
+}

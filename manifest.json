@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "sold-by-amazon-filter-extension",
+  "version": "0.0.2",
+  "description": "Defaults 'Sold by Amazon' on search pages. Click icon to disable/enable for the session.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://www.amazon.co.jp/*"
+  ],
+  "action": {
+    "default_title": "Disable 'Sold by Amazon' Filter (Session)"
+  },
+  "background": {
+    "service_worker": "dist/background.js"
+  }
+}
