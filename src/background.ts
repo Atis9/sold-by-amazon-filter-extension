@@ -1,3 +1,7 @@
+import { AMAZON_HOST, FILTER_PARAM_KEY, FILTER_PARAM_VALUE } from './constants';
+import { TabStateManager } from './services/TabStateManager';
+import { updateIcon } from './utils/icon';
+
 /**
  * @fileoverview This script manages a Chrome extension that applies a "Sold by Amazon"
  * filter on Amazon Japan search results on a per-tab basis.
@@ -7,65 +11,6 @@
  * event to intercept and redirect navigations before the page loads. State is managed
  * per-tab and encapsulated within the TabStateManager.
  */
-
-const AMAZON_HOST = "www.amazon.co.jp";
-const FILTER_PARAM_KEY = "rh";
-const FILTER_PARAM_VALUE = "p_6:AN1VRQENFRJN5";
-
-/**
- * Manages all state for tabs stored in `chrome.storage.session`.
- */
-const TabStateManager = {
-  _getStateKey: (tabId: number): string => `tab_${tabId}_enabled`,
-  _getRedirectingFlagKey: (tabId: number): string => `tab_${tabId}_redirecting`,
-
-  /** Gets the filter state for a tab. Defaults to true (enabled). */
-  async getState(tabId: number): Promise<boolean> {
-    const key = this._getStateKey(tabId);
-    const result = await chrome.storage.session.get(key);
-    return result[key] ?? true;
-  },
-
-  /** Sets the filter state for a tab. */
-  async setState(tabId: number, isEnabled: boolean): Promise<void> {
-    const key = this._getStateKey(tabId);
-    await chrome.storage.session.set({ [key]: isEnabled });
-  },
-
-  /** Checks if a tab is currently being redirected. */
-  async isRedirecting(tabId: number): Promise<boolean> {
-    const key = this._getRedirectingFlagKey(tabId);
-    const result = await chrome.storage.session.get(key);
-    return result[key] ?? false;
-  },
-
-  /** Sets a tab's redirecting flag. */
-  async setRedirecting(tabId: number, isRedirecting: boolean): Promise<void> {
-    const key = this._getRedirectingFlagKey(tabId);
-    if (isRedirecting) {
-      await chrome.storage.session.set({ [key]: true });
-    } else {
-      await chrome.storage.session.remove(key);
-    }
-  },
-
-  /** Cleans up all stored state for a closed tab. */
-  async cleanup(tabId: number): Promise<void> {
-    const stateKey = this._getStateKey(tabId);
-    const redirectingKey = this._getRedirectingFlagKey(tabId);
-    await chrome.storage.session.remove([stateKey, redirectingKey]);
-  },
-};
-
-/**
- * Updates the extension icon and tooltip for a specific tab.
- */
-const updateIcon = async (tabId: number, isEnabled: boolean): Promise<void> => {
-  const title = isEnabled
-    ? "Disable 'Sold by Amazon' Filter (This Tab)"
-    : "Enable 'Sold by Amazon' Filter (This Tab)";
-  await chrome.action.setTitle({ tabId, title });
-};
 
 // --- Event Listeners ---
 
